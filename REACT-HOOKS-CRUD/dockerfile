@@ -1,0 +1,22 @@
+# Inicia escolhendo a imagem do Python
+FROM python:3.10-alpine
+
+# Copia os requerimentos (se tiver)
+COPY requirements.txt ./
+
+# Copia todo o conetúdo local para a imagem
+COPY . .
+
+RUN apt-get update \
+	&& apt-get install -y --no-install-recommends \
+		postgresql-client \
+	&& rm -rf /var/lib/apt/lists/*
+
+# Muda o diretório de trabalho
+WORKDIR /src
+RUN pip install -r requirements.txt
+
+EXPOSE 8080
+
+# Determina o comando que será executado
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8080"]

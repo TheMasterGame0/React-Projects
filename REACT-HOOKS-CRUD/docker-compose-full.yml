@@ -1,0 +1,46 @@
+version: '1'
+
+services:
+  db:
+    container_name: db
+    image: postgres:13.4-alpine
+    environment:
+      POSTGRES_PASSWORD: "12345"
+      POSTGRES_DB: "usuarios"
+    ports:
+      - "15432:5432"
+    volumes:
+      - /tmp/data:/var/lib/postgresql/data 
+    networks:
+      - postgres-compose-network
+      
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "lucasrc.rodri@gmail.com"
+      PGADMIN_DEFAULT_PASSWORD: "123mudar"
+    ports:
+      - "16543:80"
+    depends_on:
+      - db
+    networks:
+      - postgres-compose-network
+  
+  cotecforms:
+    restart: always
+    build:
+      context: ./
+      dockerfile: dockerfile
+      network: bridge
+    depends_on:
+      - db
+    ports:
+      - "5000:5000"
+    networks:
+      - postgres-compose-network  
+    volumes:
+      - ./app:/app
+
+networks: 
+  postgres-compose-network:
+    driver: bridge
